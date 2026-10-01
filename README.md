@@ -29,7 +29,7 @@ Responsive high-fidelity album art grid with anisotropic sampling, negative LOD 
 ---
 
 ### 3. Music Explorer & Artist Overview
-In-depth artist explorer with album discography, top tracks, metadata inspection, and instant play queues.
+In-depth artist discography browser with album catalogs, top tracks, metadata inspection, and instant play queues.
 
 ![Music Explorer](docs/screenshots/music_explorer.png)
 
