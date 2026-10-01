@@ -93,35 +93,44 @@ In-depth artist discography browser with album catalogs, top tracks, metadata in
 
 ## 📦 Downloads & Releases
 
-Pre-compiled standalone portable releases for 64-bit Windows are available on the [Releases](https://github.com/sidhantjohnaind/SlothPlayer/releases) page:
+Pre-compiled standalone portable releases across all major architectures and operating systems are available on the [**Official GitHub Releases**](https://github.com/sidhantjohnaind/SlothPlayer/releases) page:
 
-1. Download `SlothPlayer-v1.0.0-windows-x64.zip`.
-2. Extract anywhere and launch `SlothPlayer.exe` (no installation required).
+| Platform / Architecture | Package | Description |
+|---|---|---|
+| **Windows x64** | [`SlothPlayer-v1.0.0-windows-x64.zip`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-v1.0.0-windows-x64.zip) | Portable Windows 10/11 Direct3D 11 (Intel / AMD) |
+| **Windows ARM64** | [`SlothPlayer-windows-arm64.zip`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-windows-arm64.zip) | Native Windows on ARM (Snapdragon X Elite / Copilot+ PCs) |
+| **Linux x64** | [`SlothPlayer-linux-x64.tar.gz`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-linux-x64.tar.gz) | Linux x86_64 OpenGL 3.3 / GLFW / ALSA |
+| **Linux ARM64** | [`SlothPlayer-linux-arm64.tar.gz`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-linux-arm64.tar.gz) | Native Linux ARM64 (aarch64 / Raspberry Pi 4/5) |
+| **Linux RISC-V 64** | [`SlothPlayer-linux-riscv64.tar.gz`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-linux-riscv64.tar.gz) | Linux RISC-V (riscv64 / SBCs) |
+| **macOS ARM64** | [`SlothPlayer-macos.tar.gz`](https://github.com/sidhantjohnaind/SlothPlayer/releases/download/v1.0.0/SlothPlayer-macos.tar.gz) | Apple Silicon (M1 / M2 / M3 / M4) CoreAudio |
 
 ---
 
-## 🛠️ Building and Running
+## 🛠️ Building Across Platforms
 
-### Requirements
-- Windows 10/11 64-bit
-- MinGW-w64 GCC (w64devkit) or MSVC
-- CMake 3.20+
-- Ninja
+SlothPlayer uses standard CMake 3.20+ and Ninja across all operating systems and architectures.
 
-### One-Click Build
-```cmd
-build.bat
-```
-
-Or via CMake:
+### Windows (DirectX 11)
 ```cmd
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
+.\build\SlothPlayer.exe
 ```
 
-### Running
-```cmd
-.\build\SlothPlayer.exe
+### Linux (AMD64, ARM64, RISC-V)
+```bash
+sudo apt-get install -y ninja-build build-essential libasound2-dev libgl1-mesa-dev libglfw3-dev
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+./build/SlothPlayer
+```
+
+### macOS (Apple Silicon & Intel)
+```bash
+brew install glfw ninja
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+./build/SlothPlayer
 ```
 
 ### Running the Subsystem Test Suite
