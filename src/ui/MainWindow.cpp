@@ -7658,7 +7658,7 @@ void MainWindow::renderNowPlayingStage(const Track* curr, float width, float hei
             ImGui::SameLine(0.0f, 6.0f);
             if (ImGui::SmallButton("🔍 Search Online")) {
                 std::string q = "https://www.google.com/search?q=" + curr->getDisplayArtist() + "+" + curr->getDisplayTitle() + "+lyrics";
-                ShellExecuteA(nullptr, "open", q.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+                Platform::openUrl(q);
             }
         } else {
             if (ImGui::SmallButton("📁##NP_LRC")) {
@@ -7672,7 +7672,7 @@ void MainWindow::renderNowPlayingStage(const Track* curr, float width, float hei
             ImGui::SameLine(0.0f, 4.0f);
             if (ImGui::SmallButton("🔍##NP_SearchLyr")) {
                 std::string q = "https://www.google.com/search?q=" + curr->getDisplayArtist() + "+" + curr->getDisplayTitle() + "+lyrics";
-                ShellExecuteA(nullptr, "open", q.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+                Platform::openUrl(q);
             }
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("Search Lyrics Online");
         }

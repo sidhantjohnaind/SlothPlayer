@@ -163,6 +163,44 @@ if (WIN32)
             dwmapi.lib
         )
     endif()
+elseif (APPLE)
+    # macOS (Apple Silicon ARM64 & Intel x86_64)
+    find_package(Threads REQUIRED)
+    find_package(OpenGL REQUIRED)
+
+    find_package(glfw3 3.3 QUIET)
+    if (glfw3_FOUND)
+        set(GLFW_LIBS glfw)
+    else()
+        find_library(GLFW_LIB NAMES glfw glfw3)
+        if (GLFW_LIB)
+            set(GLFW_LIBS ${GLFW_LIB})
+        else()
+            set(GLFW_LIBS glfw)
+        endif()
+    endif()
+
+    target_compile_options(SlothPlayer PRIVATE -O2 -Wall -Wextra -Wno-unused-parameter)
+    target_link_libraries(SlothPlayer PRIVATE
+        ${GLFW_LIBS}
+        "-framework OpenGL"
+        "-framework CoreAudio"
+        "-framework AudioToolbox"
+        "-framework CoreFoundation"
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
+        m
+    )
+
+    target_compile_options(test_audio_library PRIVATE -O2 -Wall -Wextra -Wno-unused-parameter)
+    target_link_libraries(test_audio_library PRIVATE
+        Threads::Threads
+        "-framework CoreAudio"
+        "-framework AudioToolbox"
+        "-framework CoreFoundation"
+        ${CMAKE_DL_LIBS}
+        m
+    )
 else()
     # Linux (x86_64 / AMD, aarch64 / ARM, riscv64 / RISC-V)
     find_package(Threads REQUIRED)

@@ -22,6 +22,9 @@ namespace Platform {
     // Displays open folder dialog
     std::string openFolderDialog(const std::string& title = "Select Folder");
 
+    // Opens an external URL in default web browser
+    void openUrl(const std::string& url);
+
     // Requests application shutdown
     void requestQuit();
 

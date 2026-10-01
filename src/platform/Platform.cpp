@@ -80,6 +80,19 @@ void openDirectory(const std::string& dirPath) {
 #endif
 }
 
+void openUrl(const std::string& url) {
+    if (url.empty()) return;
+#if defined(_WIN32) || defined(_WIN64)
+    ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#elif defined(__APPLE__)
+    std::string cmd = "open \"" + url + "\" >/dev/null 2>&1 &";
+    (void)std::system(cmd.c_str());
+#else
+    std::string cmd = "xdg-open \"" + url + "\" >/dev/null 2>&1 &";
+    (void)std::system(cmd.c_str());
+#endif
+}
+
 std::string openFileDialog(const std::string& filterTitle, const std::string& filterSpec) {
 #if defined(_WIN32) || defined(_WIN64)
     char szFile[MAX_PATH] = { 0 };
