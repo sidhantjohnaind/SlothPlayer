@@ -41,7 +41,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Ninja Setup (Windows)
       - name: Setup Ninja
+        if: runner.os == 'Windows'
         uses: ashutoshvarma/setup-ninja@master
         with:
           version: 1.11.1
@@ -58,13 +60,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libgl1-mesa-dev libglfw3-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+          sudo apt-get install -y ninja-build build-essential libasound2-dev libgl1-mesa-dev libglfw3-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
       # macOS Setup (Apple Silicon ARM64)
       - name: Install macOS Dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install glfw
+          brew install glfw ninja
 
       # Configure & Build
       - name: Configure CMake
