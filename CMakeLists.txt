@@ -104,6 +104,7 @@ add_executable(test_audio_library
 )
 
 if (WIN32)
+    add_compile_definitions(NOMINMAX _CRT_SECURE_NO_WARNINGS)
     if (MINGW)
         target_compile_options(SlothPlayer PRIVATE -O3 -DNDEBUG -Wall -Wextra -Wno-unused-parameter)
         target_link_libraries(SlothPlayer PRIVATE
@@ -151,6 +152,9 @@ if (WIN32)
             comdlg32.lib
             gdi32.lib
             winmm.lib
+            mfplat.lib
+            mfreadwrite.lib
+            mfuuid.lib
         )
         target_compile_options(test_audio_library PRIVATE /O2 /W3 /utf-8)
         target_link_libraries(test_audio_library PRIVATE
@@ -161,9 +165,13 @@ if (WIN32)
             comdlg32.lib
             winmm.lib
             dwmapi.lib
+            mfplat.lib
+            mfreadwrite.lib
+            mfuuid.lib
         )
     endif()
 elseif (APPLE)
+    add_compile_definitions(GL_SILENCE_DEPRECATION)
     # macOS (Apple Silicon ARM64 & Intel x86_64)
     find_package(Threads REQUIRED)
     find_package(OpenGL REQUIRED)

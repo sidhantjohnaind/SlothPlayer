@@ -9,6 +9,9 @@
 
 #if defined(_WIN32) && !defined(SLOTH_USE_OPENGL)
 #include <d3d11.h>
+#elif defined(__APPLE__)
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
 #endif

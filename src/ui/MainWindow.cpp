@@ -9864,6 +9864,7 @@ void MainWindow::renderPiPMiniPlayer() {
     float hdrH = 18.0f;
 
     // Header dragging support
+#if defined(_WIN32)
     if (m_hWnd && ImGui::IsMouseHoveringRect(hdrPos, ImVec2(hdrPos.x + availW - 85.0f, hdrPos.y + hdrH + 2.0f))) {
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f)) {
             ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
@@ -9878,6 +9879,7 @@ void MainWindow::renderPiPMiniPlayer() {
             }
         }
     }
+#endif
 
     // Yellow round media badge with play triangle (matching screenshot)
     ImVec2 badgeCenter(hdrPos.x + 8.5f, hdrPos.y + hdrH * 0.5f);
@@ -10132,6 +10134,7 @@ void MainWindow::renderMiniPlayer() {
     ImGui::PopStyleVar(5);
 
     // Global smooth non-blocking drag on window background:
+#if defined(_WIN32)
     if (m_hWnd && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyItemActive()) {
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f)) {
             ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
@@ -10148,6 +10151,13 @@ void MainWindow::renderMiniPlayer() {
             ImGui::OpenPopup("MiniPlayerContextMenu");
         }
     }
+#else
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyItemActive()) {
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup("MiniPlayerContextMenu");
+        }
+    }
+#endif
 
     // Outer subtle 1.2px antialiased border with smooth rounded corners matching cornerRadius
     ImDrawList* fgDl = ImGui::GetForegroundDrawList();
@@ -10214,7 +10224,7 @@ void MainWindow::renderAutoDJModal() {
         ImGui::SliderInt("Do not repeat track within N tracks", &cfg.trackSeparationTracks, 5, 50);
 
         char genreBuf[64] = {0};
-        strncpy_s(genreBuf, cfg.genreFilter.c_str(), sizeof(genreBuf) - 1);
+        snprintf(genreBuf, sizeof(genreBuf), "%s", cfg.genreFilter.c_str());
         ImGui::Text("Genre Filter (empty for all genres):");
         if (ImGui::InputText("##djGenre", genreBuf, sizeof(genreBuf))) {
             cfg.genreFilter = genreBuf;
@@ -10339,9 +10349,9 @@ void MainWindow::showBatchTagModal() {
         uint64_t firstId = *m_selectedTrackIds.begin();
         const Track* t = m_library.getTrackById(firstId);
         if (t) {
-            strncpy_s(m_batchArtist, t->artist.c_str(), sizeof(m_batchArtist) - 1);
-            strncpy_s(m_batchAlbum, t->album.c_str(), sizeof(m_batchAlbum) - 1);
-            strncpy_s(m_batchGenre, t->genre.c_str(), sizeof(m_batchGenre) - 1);
+            snprintf(m_batchArtist, sizeof(m_batchArtist), "%s", t->artist.c_str());
+            snprintf(m_batchAlbum, sizeof(m_batchAlbum), "%s", t->album.c_str());
+            snprintf(m_batchGenre, sizeof(m_batchGenre), "%s", t->genre.c_str());
             m_batchYear = t->year;
             m_batchRating = t->rating;
         }
