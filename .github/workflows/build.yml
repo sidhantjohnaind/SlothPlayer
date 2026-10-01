@@ -21,12 +21,20 @@ jobs:
         include:
           - os: windows-latest
             os_name: Windows x64
+            msvc_arch: x64
             artifact_name: SlothPlayer-windows-x64.zip
+          - os: windows-latest
+            os_name: Windows ARM64
+            msvc_arch: amd64_arm64
+            artifact_name: SlothPlayer-windows-arm64.zip
           - os: ubuntu-latest
             os_name: Linux x64
             artifact_name: SlothPlayer-linux-x64.tar.gz
+          - os: ubuntu-24.04-arm
+            os_name: Linux ARM64
+            artifact_name: SlothPlayer-linux-arm64.tar.gz
           - os: macos-latest
-            os_name: macOS
+            os_name: macOS (Apple Silicon ARM64)
             artifact_name: SlothPlayer-macos.tar.gz
 
     steps:
@@ -38,19 +46,21 @@ jobs:
         with:
           version: 1.11.1
 
-      # Windows Setup
+      # Windows Setup (x64 and ARM64 via MSVC cross-tools)
       - name: Setup MSVC (Windows)
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch || 'x64' }}
 
-      # Linux Setup
+      # Linux Setup (x64 and ARM64 native)
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libgl1-mesa-dev libglfw3-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
-      # macOS Setup
+      # macOS Setup (Apple Silicon ARM64)
       - name: Install macOS Dependencies
         if: runner.os == 'macOS'
         run: |
@@ -74,7 +84,7 @@ jobs:
           Copy-Item build\SlothPlayer.exe dist\
           Copy-Item README.md dist\
           Copy-Item LICENSE dist\
-          Compress-Archive -Path dist\* -DestinationPath SlothPlayer-windows-x64.zip
+          Compress-Archive -Path dist\* -DestinationPath ${{ matrix.artifact_name }}
 
       - name: Package Linux
         if: runner.os == 'Linux'
@@ -83,7 +93,7 @@ jobs:
           cp build/SlothPlayer dist/
           cp README.md dist/
           cp LICENSE dist/
-          tar -czvf SlothPlayer-linux-x64.tar.gz -C dist .
+          tar -czvf ${{ matrix.artifact_name }} -C dist .
 
       - name: Package macOS
         if: runner.os == 'macOS'
@@ -92,7 +102,7 @@ jobs:
           cp build/SlothPlayer dist/
           cp README.md dist/
           cp LICENSE dist/
-          tar -czvf SlothPlayer-macos.tar.gz -C dist .
+          tar -czvf ${{ matrix.artifact_name }} -C dist .
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -105,4 +115,45 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.artifact_name }}
+          generate_release_notes: true
+
+  build-riscv:
+    name: Build (Linux RISC-V 64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build on RISC-V 64 via QEMU
+        uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: riscv64
+          distro: ubuntu24.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt-get update
+            apt-get install -y software-properties-common || true
+            add-apt-repository -y universe || true
+            apt-get update
+            apt-get install -y build-essential cmake ninja-build libasound2-dev libgl1-mesa-dev libglfw3-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev tar gzip
+          run: |
+            cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --config Release --target SlothPlayer
+            mkdir -p dist
+            cp build/SlothPlayer dist/
+            cp README.md dist/
+            cp LICENSE dist/
+            tar -czvf SlothPlayer-linux-riscv64.tar.gz -C dist .
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlothPlayer-linux-riscv64.tar.gz
+          path: SlothPlayer-linux-riscv64.tar.gz
+
+      - name: Publish GitHub Release Asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SlothPlayer-linux-riscv64.tar.gz
           generate_release_notes: true

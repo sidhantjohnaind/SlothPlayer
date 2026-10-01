@@ -872,25 +872,29 @@ int main(int argc, char** argv) {
     }
 
     // GL Version and Shader Configuration
-#if defined(__arm__) || defined(__aarch64__)
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    const char* glsl_version = "#version 130";
+#if defined(__APPLE__)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glsl_version = "#version 150";
+#elif defined(__arm__) || defined(__aarch64__)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    const char* glsl_version = "#version 300 es";
+    glsl_version = "#version 130";
 #else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if defined(__APPLE__)
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-    const char* glsl_version = "#version 130";
+    glsl_version = "#version 130";
 #endif
 
     GLFWwindow* window = glfwCreateWindow(1260, 760, "SlothPlayer", nullptr, nullptr);
     if (!window) {
-        // Fallback for software rasterizers or older drivers (e.g. RISC-V headless or embedded)
+        // Fallback for software rasterizers, llvmpipe, older drivers, or RISC-V SBCs
         glfwDefaultWindowHints();
+        glsl_version = "#version 130";
         window = glfwCreateWindow(1260, 760, "SlothPlayer", nullptr, nullptr);
         if (!window) {
             glfwTerminate();
