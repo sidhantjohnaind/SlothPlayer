@@ -1,0 +1,34 @@
+# Build directories & binaries
+build/
+bin/
+out/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.pdb
+*.ilk
+
+# IDE & local configuration
+.vscode/
+.vs/
+*.vcxproj*
+*.sln
+imgui.ini
+
+# Local user data, caches & test dumps
+scratch/
+slothplayer_library.json
+slothplayer_settings.json
+slothplayer_audio_config.json
+scrobbles.json
+musicbee_library.json
+musicbee_ui_dump*.txt
+sloth_library.db
+*.db-*
+
+# Root test images
+/crop_vu.png
+/vu_detail.png
+/vu_labels.png
