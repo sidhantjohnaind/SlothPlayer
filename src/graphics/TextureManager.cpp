@@ -68,7 +68,7 @@ void TextureManager::shutdown() {
         ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(m_defaultArtwork.id);
         if (srv) srv->Release();
 #else
-        GLuint tex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(m_defaultArtwork.id));
+        GLuint tex = (GLuint)(uintptr_t)(m_defaultArtwork.id);
         if (tex != 0) glDeleteTextures(1, &tex);
 #endif
         m_defaultArtwork = { 0, 0, 0 };
@@ -85,7 +85,7 @@ void TextureManager::freeTextureItem(TextureItem& item) {
         ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(item.id);
         if (srv) srv->Release();
 #else
-        GLuint tex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(item.id));
+        GLuint tex = (GLuint)(uintptr_t)(item.id);
         if (tex != 0) glDeleteTextures(1, &tex);
 #endif
     }
@@ -171,21 +171,24 @@ TextureItem TextureManager::createTextureFromRGBA(const uint8_t* rgba, int width
     return (FAILED(hr)) ? TextureItem{ 0, 0, 0 } : TextureItem{ reinterpret_cast<ImTextureID>(pSRV), width, height };
 
 #else
-    // OpenGL 3.3 / GLES (Linux: x86_64, ARM, RISC-V)
+    // OpenGL 3.3 / GLES (Linux: x86_64, ARM, RISC-V, macOS)
     GLuint tex = 0;
     glGenTextures(1, &tex);
     if (tex == 0) return { 0, 0, 0 };
 
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
-    glGenerateMipmap(GL_TEXTURE_2D);
 
-    return { reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(tex)), width, height };
+    return { (ImTextureID)(uintptr_t)tex, width, height };
 #endif
 }
 
